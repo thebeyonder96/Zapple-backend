@@ -10,45 +10,47 @@ const router = Router();
 
 // Login Section
 
-router.get(
-  "/seed",
-  asyncHandler(async (req, res) => {
-    const userCount = await UserModel.countDocuments();
-    if (userCount > 0) {
-      res.send("already seeded");
-      return;
-    }
+// router.get(
+//   "/seed",
+//   asyncHandler(async (req, res) => {
+//     const userCount = await UserModel.countDocuments();
+//     if (userCount > 0) {
+//       res.send("already seeded");
+//       return;
+//     }
 
-    await UserModel.create(sample_users);
-    res.send("seeded");
-  })
-);
+//     await UserModel.create(sample_users);
+//     res.send("seeded");
+//   })
+// );
 
 router.post(
   "/login",
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res: any) => {
     const { email, password } = req.body;
 
-    const user = await UserModel.findOne({ email });
-    const compare = await bcrypt.compare(password, user!.password);
-    console.log(compare);
-
-    if (compare) {
-      res.send(generateToken(user));
-    } else {
-      res.status(400).send("Username or Password is invalid");
+    try {
+      const user = await UserModel.findOne({ email });
+      if (!user) return res.status(400).send("User not found");
+      const compare = await bcrypt.compare(password, user!.password);
+      if (!compare) return res.status(400).send("Incorrect password");
+      if (compare) {
+        res.send(generateToken(user));
+      }
+    } catch (error) {
+      res.status(400).send(error);
     }
+    // res.status(400).send("Username or Password is invalid");
   })
 );
 
 router.post(
   "/register",
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: any, res: any) => {
     const { name, email, password, address } = req.body;
     const user = await UserModel.findOne({ email });
     if (user) {
-      res.status(400).send("Email already exist , please login");
-      return;
+      return res.status(400).send("Email already exist , please login");
     }
 
     const encryptedPass = await bcrypt.hash(password, 10);
@@ -68,13 +70,14 @@ router.post(
 const generateToken = (user: any) => {
   const token = jwt.sign(
     {
+      id: user.id,
       email: user.email,
       isAdmin: user.isAdmin,
     },
     "Akshay",
     { expiresIn: "30d" }
   );
-  console.log(user);
+  // console.log(user);
   return {
     id: user.id,
     email: user.email,
