@@ -9,7 +9,6 @@ const stripe = require("stripe")(
 
 router.post("/stripe", async (req, res, next) => {
   const products: Array<any> = req.body.items;
-
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -69,7 +68,7 @@ router.post("/stripe", async (req, res, next) => {
             name: item.food.name,
             images: [item.food.imageUrl],
           },
-          unit_amount: item.price * 100,
+          unit_amount: item.food.price * 100,
         },
         quantity: item.quantity,
       })),

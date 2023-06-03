@@ -19,18 +19,18 @@ export const foodSchema = new Schema<Food>(
     tags: { type: [String] },
     favorite: { type: Boolean, default: false },
     imageUrl: { type: String, required: true },
-    origins: { type: [String], required: true },
+    origins: { type: [String] },
     cookTime: { type: String, required: true },
   },
   {
-    toJSON:{
-        virtuals:true
+    toJSON: {
+      virtuals: true,
     },
-    toObject:{
-        virtuals:true
+    toObject: {
+      virtuals: true,
     },
-    timestamps:true
+    timestamps: true,
   }
 );
 
-export const FoodModel = model<Food>('food',foodSchema)
+export const FoodModel = model<Food>("food", foodSchema);
