@@ -67,6 +67,8 @@ router.post(
     };
     const dbUser = await UserModel.create(newUser);
     res.send(generateToken(dbUser));
+    console.log(process.env.GMAIL_KEY);
+
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
@@ -84,8 +86,8 @@ router.post(
       subject: "Welcome",
       html: `<h1 style="color:#008000">Registration Successful</h1>
         Thank you!
-        <p>Welcome <span style="font-weight:bold">${req.body.firstName}</span> to Zapple</p>
-        Thanks for signing up. Order your favorite food online with Zapple. 
+        <p>Welcome <span style="font-weight:bold">${req.body.name}</span> to Zapple</p>
+        Thanks for signing up. Order your favorite food online with Zapple.
         `,
     };
 
