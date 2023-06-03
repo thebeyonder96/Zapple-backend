@@ -5,8 +5,11 @@ import asyncHandler from "express-async-handler";
 import { User, UserModel } from "../models/user.model";
 import { FoodModel } from "../models/food.model";
 import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
 
 const router = Router();
+dotenv.config();
 
 // Login Section
 
@@ -64,6 +67,37 @@ router.post(
     };
     const dbUser = await UserModel.create(newUser);
     res.send(generateToken(dbUser));
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      service: "gmail",
+      auth: {
+        user: "akshaynew45@gmail.com",
+        pass: process.env.GMAIL_KEY,
+      },
+    });
+
+    const mailOptions = {
+      from: "Zapple",
+      to: req.body.email,
+      subject: "Welcome",
+      html: `<h1 style="color:#008000">Registration Successful</h1>
+        Thank you!
+        <p>Welcome <span style="font-weight:bold">${req.body.firstName}</span> to Zapple</p>
+        Thanks for signing up. Order your favorite food online with Zapple. 
+        `,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        res.send(error);
+      } else {
+        console.log("Email sent", info.response);
+        res.send("successful");
+      }
+    });
   })
 );
 
